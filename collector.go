@@ -17,12 +17,14 @@ type collector struct {
 	client *hitron.CableModem
 	rc     routerCollector
 	cc     cmCollector
+	wc     wifiCollector
 }
 
 func newCollector(ctx context.Context, conf config, logger log.Logger) *collector {
 	c := &collector{ctx: ctx, config: conf, logger: logger}
 	c.rc = newRouterCollector(ctx, logger, c.getClient)
 	c.cc = newCMCollector(ctx, logger, c.getClient)
+	c.wc = newWiFiCollector(ctx, logger, c.getClient)
 
 	return c
 }
@@ -35,6 +37,7 @@ func (c *collector) getClient() *hitron.CableModem {
 func (c collector) Describe(ch chan<- *prometheus.Desc) {
 	c.rc.Describe(ch)
 	c.cc.Describe(ch)
+	c.wc.Describe(ch)
 }
 
 // Collect implements Prometheus.Collector.
@@ -61,4 +64,5 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 
 	c.rc.Collect(ch)
 	c.cc.Collect(ch)
+	c.wc.Collect(ch)
 }
