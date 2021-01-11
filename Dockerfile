@@ -27,6 +27,7 @@ RUN mv bin/${PKG_NAME}* /bin/
 FROM scratch AS release-linux
 
 ARG PKG_NAME
+ENV BIN=${PKG_NAME}
 ARG VCS_REF
 ARG TARGETOS
 ARG TARGETARCH
@@ -38,11 +39,12 @@ LABEL org.opencontainers.image.revision=$VCS_REF \
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${PKG_NAME}
 
-ENTRYPOINT [ "/${PKG_NAME}" ]
+ENTRYPOINT [ /${BIN} ]
 
 FROM alpine:3.12.3 AS alpine
 
 ARG PKG_NAME
+ENV BIN=${PKG_NAME}
 ARG VCS_REF
 ARG TARGETOS
 ARG TARGETARCH
@@ -54,7 +56,7 @@ LABEL org.opencontainers.image.revision=$VCS_REF \
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${PKG_NAME}
 
-ENTRYPOINT [ "/bin/${PKG_NAME}" ]
+ENTRYPOINT [ /bin/${BIN} ]
 
 FROM --platform=windows/amd64 mcr.microsoft.com/windows/nanoserver:1809 AS release-windows
 
