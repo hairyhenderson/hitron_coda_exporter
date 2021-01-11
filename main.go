@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"

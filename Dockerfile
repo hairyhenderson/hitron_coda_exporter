@@ -54,7 +54,7 @@ LABEL org.opencontainers.image.revision=$VCS_REF \
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${PKG_NAME}
 
-ENTRYPOINT [ "/bin/hitron_coda_exporter" ]
+ENTRYPOINT [ "/hitron_coda_exporter" ]
 
 FROM --platform=windows/amd64 mcr.microsoft.com/windows/nanoserver:2009 AS release-windows
 
