@@ -140,7 +140,7 @@ func newCMCollector(ctx context.Context, logger log.Logger, clientProvider func(
 		Namespace: metricsNS,
 		Subsystem: sub,
 		Name:      "downstream_ofdm_plc_power_dbmv",
-		Help:      "Power level the device has been instructed to use on this OFDM connection by the Physical Link Channel, in dB above/below 1mV",
+		Help:      "Power level device was instructed to use on this OFDM connection by the Physical Link Channel, in dB above/below 1mV",
 	}, dsOfdmLabels)
 
 	usOfdmLabels := []string{"channel", "enabled", "fft_size"}
@@ -232,10 +232,12 @@ func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.
 	}
 
 	// bytes not bits
+	//nolint:gomnd
 	c.sysInfo.usDataRate.Set(float64(si.UsDataRate) / 8)
 	c.sysInfo.usDataRate.Collect(ch)
 
 	// bytes not bits
+	//nolint:gomnd
 	c.sysInfo.dsDataRate.Set(float64(si.DsDataRate) / 8)
 	c.sysInfo.dsDataRate.Collect(ch)
 
@@ -288,6 +290,7 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 		c.usInfo.frequency.With(l).Set(float64(port.Frequency))
 		c.usInfo.signalStrength.With(l).Set(port.SignalStrength)
 		// we want bytes/sec here, not bits/sec
+		//nolint:gomnd
 		c.usInfo.bandwidth.With(l).Set(float64(port.Bandwidth) / 8)
 	}
 

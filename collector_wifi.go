@@ -23,8 +23,7 @@ type wifiCollector struct {
 	}
 }
 
-//nolint:funlen
-func newwifiCollector(ctx context.Context, logger log.Logger, clientProvider func() *hitron.CableModem) wifiCollector {
+func newWiFiCollector(ctx context.Context, logger log.Logger, clientProvider func() *hitron.CableModem) wifiCollector {
 	c := wifiCollector{ctx: ctx, logger: logger, client: clientProvider}
 
 	sub := "wifi"
@@ -88,9 +87,11 @@ func (c wifiCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 
 		c.clientStats.rssi.With(l).Set(float64(cl.RSSI))
+		//nolint:gomnd
 		c.clientStats.dataRate.With(l).Set(float64(cl.DataRate) / 8)
 		c.clientStats.bandwidth.With(l).Set(float64(cl.Bandwidth))
 	}
+
 	c.clientStats.rssi.Collect(ch)
 	c.clientStats.dataRate.Collect(ch)
 	c.clientStats.bandwidth.Collect(ch)
