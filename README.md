@@ -51,11 +51,11 @@ password: mypassword
 To run the exporter:
 
 ```console
-$ docker run -v /tmp/hitron_coda.yml:/hitron_coda.yml -p 9779:9779 hairyhenderson/hitron_coda_exporter
+$ docker run -v /tmp/hitron_coda.yml:/hitron_coda.yml -p 9780:9780 hairyhenderson/hitron_coda_exporter
 ...
 ```
 
-Now you can visit http://localhost:9779/scrape to have the exporter scrape
+Now you can visit http://localhost:9780/scrape to have the exporter scrape
 metrics from the device.
 
 To configure Prometheus to scrape from this exporter, use a
@@ -67,7 +67,7 @@ like this one:
     metrics_path: /scrape
     static_configs:
       - targets:
-        - 'localhost:9779'
+        - 'localhost:9780'
 ```
 
 ## License

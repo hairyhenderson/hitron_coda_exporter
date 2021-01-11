@@ -22,7 +22,7 @@ import (
 
 var (
 	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("hitron_coda.yml").String()
-	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9779").String()
+	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9780").String()
 	// dryRun        = kingpin.Flag("dry-run", "Only verify configuration is valid and exit.").Default("false").Bool()
 
 	sc = &safeConfig{
