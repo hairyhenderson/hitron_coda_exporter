@@ -11,6 +11,30 @@ configured in a configuration file.
 This is tested on a Hitron CODA-4680 with firmware `7.1.1.2.2b9`, untested on
 other models and releases.
 
+## Installation
+
+You can build a binary for your system with `go get github.com/hairyhenderson/hitron_coda_exporter`,
+or you can use a [pre-built Docker image](https://hub.docker.com/r/hairyhenderson/hitron_coda_exporter):
+
+```console
+$ docker run hairyhenderson/hitron_coda_exporter
+```
+
+There are two variants: `:latest` and `:alpine` - no difference except the
+latter is based on Alpine and contains a shell. The former is a `FROM scratch`
+image, containing only the binary.
+
+The image is built for multiple platforms and architectures:
+
+- `linux/amd64` (x86_64)
+- `linux/arm64` (64-bit ARM/aarch64)
+- `linux/arm/v6` (32-bit ARM v6, like Raspberry Pi Zero)
+- `linux/arm/v7` (32-bit ARM v7, like Raspbarry Pi 2B)
+- `windows/amd64` (Windows, based on Windows Nano Server)
+
+See https://hub.docker.com/r/hairyhenderson/hitron_coda_exporter for full
+details.
+
 ## Usage
 
 First, you need a configuration file with the address, username, and password
@@ -27,7 +51,7 @@ password: mypassword
 To run the exporter:
 
 ```console
-$ hitron_coda_exporter
+$ docker run -v /tmp/hitron_coda.yml:/hitron_coda.yml -p 9779:9779 hairyhenderson/hitron_coda_exporter
 ...
 ```
 
