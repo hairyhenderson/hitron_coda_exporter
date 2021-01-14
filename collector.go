@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -20,7 +21,18 @@ type collector struct {
 	wc     wifiCollector
 }
 
+type debugLogAdapter struct {
+	log.Logger
+}
+
+func (l debugLogAdapter) Logf(format string, args ...interface{}) {
+	l.Log("msg", fmt.Sprintf(format, args...))
+}
+
 func newCollector(ctx context.Context, conf config, logger log.Logger) *collector {
+	debugLogger := debugLogAdapter{level.Debug(logger)}
+	ctx = hitron.ContextWithDebugLogger(ctx, debugLogger)
+
 	c := &collector{ctx: ctx, config: conf, logger: logger}
 	c.rc = newRouterCollector(ctx, logger, c.getClient)
 	c.cc = newCMCollector(ctx, logger, c.getClient)
