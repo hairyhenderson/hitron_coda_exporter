@@ -107,8 +107,8 @@ github.com/gorilla/websocket v0.0.0-20170926233335-4201258b820c/go.mod h1:E7qHFY
 github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4/go.mod h1:FiyG127CGDf3tlThmgyCl78X/SZQqEOJBCDaAfeWzPs=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway v1.9.5/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
-github.com/hairyhenderson/hitron_coda v0.0.0-20210114015924-f9b0404b0c6c h1:EsxbHBCKdTGn+EV3ZKib6pD2x2wy+CUIutOwZK8oiNM=
-github.com/hairyhenderson/hitron_coda v0.0.0-20210114015924-f9b0404b0c6c/go.mod h1:TeEfZ7WOwyioPEvtP2sU1Cscfx491/QN5GQJDSCajSA=
+github.com/hairyhenderson/hitron_coda v0.0.0-20210115204605-77e14a5db008 h1:fwfNBqOmcD67m6h/Rhqoem6nhFgZpx/GrO2wah2cGCk=
+github.com/hairyhenderson/hitron_coda v0.0.0-20210115204605-77e14a5db008/go.mod h1:TeEfZ7WOwyioPEvtP2sU1Cscfx491/QN5GQJDSCajSA=
 github.com/hashicorp/consul/api v1.3.0/go.mod h1:MmDNSzIMUjNpY/mQ398R4bk2FnqQLoPndWW5VkKPlCE=
 github.com/hashicorp/consul/sdk v0.3.0/go.mod h1:VKf9jXwCTEY1QZP2MOLRhb5i/I/ssyNV1vwHyQBF0x8=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=

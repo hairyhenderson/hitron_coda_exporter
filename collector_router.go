@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -101,10 +102,21 @@ func (c routerCollector) Describe(ch chan<- *prometheus.Desc) {
 
 // Collect implements Prometheus.Collector.
 func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
-	si, err := c.client().RouterSysInfo(c.ctx)
+	client := c.client()
+	if client == nil {
+		err := fmt.Errorf("client not initialized: %v", client)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterClientErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
+
+		return
+	}
+
+	si, err := client.RouterSysInfo(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"router_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
 
 		return
 	}

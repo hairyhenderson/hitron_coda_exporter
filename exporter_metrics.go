@@ -42,9 +42,16 @@ var (
 			Help:      "Errors in requests to the Hitron CODA exporter",
 		},
 	)
+	exporterClientErrors = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Namespace: metricsNS,
+			Name:      "client_errors_total",
+			Help:      "Errors with the Hitron CODA client",
+		},
+	)
 )
 
 func initExporterMetrics() {
 	prometheus.MustRegister(buildInfo)
-	prometheus.MustRegister(exporterDuration, exporterRequestErrors)
+	prometheus.MustRegister(exporterDuration, exporterRequestErrors, exporterClientErrors)
 }
