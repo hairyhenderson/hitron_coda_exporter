@@ -58,7 +58,8 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 	c.client, err = hitron.New(c.config.Host, c.config.Username, c.config.Password)
 
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterClientErrors.Inc()
 		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_error", "Error scraping target", nil, nil), err)
 
 		return
@@ -66,7 +67,8 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 
 	err = c.client.Login(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterClientErrors.Inc()
 		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_error", "Error scraping target", nil, nil), err)
 
 		return

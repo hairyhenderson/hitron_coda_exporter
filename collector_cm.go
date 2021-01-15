@@ -210,8 +210,9 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 	client := c.client()
 	if client == nil {
 		err := fmt.Errorf("client not initialized: %v", client)
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterClientErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -225,8 +226,9 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	si, err := client.CMSysInfo(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -250,8 +252,9 @@ func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.
 func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	dsinfo, err := client.CMDsInfo(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -278,8 +281,9 @@ func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usinfo, err := client.CMUsInfo(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -302,8 +306,9 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usofdm, err := client.CMUsOfdm(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -330,8 +335,9 @@ func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.Cab
 
 	dsofdm, err := client.CMDsOfdm(c.ctx)
 	if err != nil {
-		level.Info(c.logger).Log("msg", "Error scraping target", "err", err)
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"cm_error", "Error scraping target", nil, nil), err)
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
