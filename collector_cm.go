@@ -45,6 +45,7 @@ type cmCollector struct {
 		repPower    *prometheus.GaugeVec
 		targetPower *prometheus.GaugeVec
 	}
+	versionInfo *prometheus.GaugeVec
 }
 
 //nolint:funlen
@@ -175,6 +176,13 @@ func newCMCollector(ctx context.Context, logger log.Logger, clientProvider func(
 		Help:      "Target power (P1.6r_n, or power spectral density in 1.6MHz) of this channel, in quarter-dB above/below 1mV (quarter-dBmV).",
 	}, usOfdmLabels)
 
+	c.versionInfo = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: metricsNS,
+		Subsystem: sub,
+		Name:      "version_info",
+		Help:      "A metric with a constant '1' value labeled by various version information.",
+	}, []string{"device_id", "model", "vendor", "serial", "hw_version", "api_version", "sw_version"})
+
 	return c
 }
 
@@ -203,6 +211,8 @@ func (c cmCollector) Describe(ch chan<- *prometheus.Desc) {
 	c.usOfdm.digAttenBo.Describe(ch)
 	c.usOfdm.repPower.Describe(ch)
 	c.usOfdm.targetPower.Describe(ch)
+
+	c.versionInfo.Describe(ch)
 }
 
 // Collect implements Prometheus.Collector.
@@ -221,6 +231,30 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 	c.collectDsInfo(ch, client)
 	c.collectUsInfo(ch, client)
 	c.collectOfdm(ch, client)
+	c.collectVersionInfo(ch, client)
+}
+
+func (c cmCollector) collectVersionInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
+	vi, err := client.CMVersion(c.ctx)
+	if err != nil {
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
+
+		return
+	}
+
+	l := prometheus.Labels{
+		"device_id":   vi.DeviceID,
+		"model":       vi.ModelName,
+		"vendor":      vi.VendorName,
+		"serial":      vi.SerialNum,
+		"hw_version":  vi.HwVersion,
+		"api_version": vi.APIVersion,
+		"sw_version":  vi.SoftwareVersion,
+	}
+	c.versionInfo.With(l).Set(1)
+	c.versionInfo.Collect(ch)
 }
 
 func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {

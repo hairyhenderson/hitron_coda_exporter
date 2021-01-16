@@ -26,6 +26,7 @@ type routerCollector struct {
 		wanTransmitPacketsTotal *prometheus.CounterVec
 		systemLanUptimeSeconds  *prometheus.GaugeVec
 		systemWanUptimeSeconds  *prometheus.GaugeVec
+		info                    *prometheus.GaugeVec
 	}
 }
 
@@ -92,6 +93,13 @@ func newRouterCollector(ctx context.Context, logger log.Logger, clientProvider f
 		Help:      "The WAN interface's uptime in seconds",
 	}, []string{"wan_name"})
 
+	c.sysInfo.info = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: metricsNS,
+		Subsystem: sub,
+		Name:      "sys_info",
+		Help:      "A metric with a constant '1' value labeled by various system information.",
+	}, []string{"lan_ip", "wan_ip4", "wan_ip6", "dns4", "dns6", "rf_mac", "router_mode"})
+
 	return c
 }
 
@@ -147,4 +155,49 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 
 	c.sysInfo.systemWanUptimeSeconds.WithLabelValues(si.WanName).Set(si.SystemWanUptime.Seconds())
 	c.sysInfo.systemWanUptimeSeconds.Collect(ch)
+
+	c.sysInfo.info.With(routerSysInfoLabels(si)).Set(1)
+	c.sysInfo.info.Collect(ch)
+}
+
+func routerSysInfoLabels(sysInfo hitron.RouterSysInfo) prometheus.Labels {
+	mask, _ := sysInfo.PrivLanNet.Mask.Size()
+	lanIP := fmt.Sprintf("%s/%d", sysInfo.PrivLanIP, mask)
+	wanIP4 := ""
+	wanIP6 := ""
+
+	for _, ip := range sysInfo.WanIP {
+		if ip.To4() != nil {
+			wanIP4 = ip.String()
+		} else {
+			wanIP6 = ip.String()
+		}
+	}
+
+	dns4 := ""
+	dns6 := ""
+
+	for _, d := range sysInfo.DNS {
+		if d.To4() != nil {
+			dns4 = d.String()
+		} else {
+			dns6 = d.String()
+		}
+	}
+
+	l := prometheus.Labels{
+		"lan_ip":  lanIP,
+		"wan_ip4": wanIP4,
+		"wan_ip6": wanIP6,
+		"dns4":    dns4,
+		"dns6":    dns6,
+		// This displays the Media Access Control (MAC) address of the CODA-4x8x's
+		// Hybrid-Fiber Coax (HFC) module. This is the module that connects to
+		// the Internet through the CATV connection.
+		"rf_mac": sysInfo.RFMac.String(),
+		// Dualstack or otherwise...
+		"router_mode": sysInfo.RouterMode,
+	}
+
+	return l
 }
