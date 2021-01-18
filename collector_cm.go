@@ -294,7 +294,11 @@ func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.C
 	}
 
 	for _, port := range dsinfo.Ports {
-		l := prometheus.Labels{"port": port.PortID, "channel": port.ChannelID}
+		l := prometheus.Labels{
+			"port":       port.PortID,
+			"channel":    port.ChannelID,
+			"modulation": port.Modulation,
+		}
 
 		c.dsInfo.frequency.With(l).Set(float64(port.Frequency))
 		c.dsInfo.signalStrength.With(l).Set(port.SignalStrength)
