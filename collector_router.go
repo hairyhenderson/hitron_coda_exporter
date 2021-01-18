@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -129,7 +128,7 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	c.sysInfo.systemTimeSeconds.Set(float64(si.SystemTime.UnixNano()) / float64(time.Nanosecond))
+	c.sysInfo.systemTimeSeconds.Set(float64(si.SystemTime.Unix()))
 	c.sysInfo.systemTimeSeconds.Collect(ch)
 
 	c.sysInfo.lanReceiveBytesTotal.WithLabelValues(si.LANName).Add(float64(si.LanRx))
