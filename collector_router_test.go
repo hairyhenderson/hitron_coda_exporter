@@ -18,6 +18,7 @@ func TestRouterSysInfoLabels(t *testing.T) {
 		RFMac:      net.HardwareAddr{0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE},
 		RouterMode: "fancy!",
 	}
+	loc := hitron.RouterLocation{LocationText: "attic"}
 	expected := prometheus.Labels{
 		"lan_ip":      "192.168.0.1/24",
 		"wan_ip4":     "127.200.100.10",
@@ -26,7 +27,8 @@ func TestRouterSysInfoLabels(t *testing.T) {
 		"dns6":        "2001:3::2",
 		"rf_mac":      "de:ad:be:ef:ca:fe",
 		"router_mode": "fancy!",
+		"location":    "attic",
 	}
-	out := routerSysInfoLabels(si)
+	out := routerSysInfoLabels(si, loc)
 	assert.Equal(t, expected, out)
 }

@@ -97,7 +97,7 @@ func newRouterCollector(ctx context.Context, logger log.Logger, clientProvider f
 		Subsystem: sub,
 		Name:      "sys_info",
 		Help:      "A metric with a constant '1' value labeled by various system information.",
-	}, []string{"lan_ip", "wan_ip4", "wan_ip6", "dns4", "dns6", "rf_mac", "router_mode"})
+	}, []string{"lan_ip", "wan_ip4", "wan_ip6", "dns4", "dns6", "rf_mac", "router_mode", "location"})
 
 	return c
 }
@@ -155,11 +155,20 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 	c.sysInfo.systemWanUptimeSeconds.WithLabelValues(si.WanName).Set(si.SystemWanUptime.Seconds())
 	c.sysInfo.systemWanUptimeSeconds.Collect(ch)
 
-	c.sysInfo.info.With(routerSysInfoLabels(si)).Set(1)
+	loc, err := client.RouterLocation(c.ctx)
+	if err != nil {
+		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		exporterRequestErrors.Inc()
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
+
+		return
+	}
+
+	c.sysInfo.info.With(routerSysInfoLabels(si, loc)).Set(1)
 	c.sysInfo.info.Collect(ch)
 }
 
-func routerSysInfoLabels(sysInfo hitron.RouterSysInfo) prometheus.Labels {
+func routerSysInfoLabels(sysInfo hitron.RouterSysInfo, loc hitron.RouterLocation) prometheus.Labels {
 	mask, _ := sysInfo.PrivLanNet.Mask.Size()
 	lanIP := fmt.Sprintf("%s/%d", sysInfo.PrivLanIP, mask)
 	wanIP4 := ""
@@ -196,6 +205,7 @@ func routerSysInfoLabels(sysInfo hitron.RouterSysInfo) prometheus.Labels {
 		"rf_mac": sysInfo.RFMac.String(),
 		// Dualstack or otherwise...
 		"router_mode": sysInfo.RouterMode,
+		"location":    loc.LocationText,
 	}
 
 	return l

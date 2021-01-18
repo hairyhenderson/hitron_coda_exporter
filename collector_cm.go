@@ -73,7 +73,7 @@ func newCMCollector(ctx context.Context, logger log.Logger, clientProvider func(
 		Help:      "Lease duration for DHCP on WAN interface",
 	}, []string{"ip", "mac_addr"})
 
-	portInfoLabels := []string{"port", "channel"}
+	portInfoLabels := []string{"port", "channel", "modulation"}
 	c.dsInfo.frequency = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
@@ -323,7 +323,11 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 	}
 
 	for _, port := range usinfo.Ports {
-		l := prometheus.Labels{"port": port.PortID, "channel": port.ChannelID}
+		l := prometheus.Labels{
+			"port":       port.PortID,
+			"channel":    port.ChannelID,
+			"modulation": port.Modulation,
+		}
 
 		c.usInfo.frequency.With(l).Set(float64(port.Frequency))
 		c.usInfo.signalStrength.With(l).Set(port.SignalStrength)
