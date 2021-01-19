@@ -16,3 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - run: make ci-lint
+  test-mixin:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/hairyhenderson/gomplate-ci-build:latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - run: go install github.com/monitoring-mixins/mixtool/cmd/mixtool
+      - run: go install github.com/google/go-jsonnet/cmd/jsonnetfmt
+      - run: make lint build
+        working-directory: hitron-mixin
