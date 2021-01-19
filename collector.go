@@ -19,6 +19,8 @@ type collector struct {
 	rc     routerCollector
 	cc     cmCollector
 	wc     wifiCollector
+
+	up prometheus.Gauge
 }
 
 type debugLogAdapter struct {
@@ -38,6 +40,12 @@ func newCollector(ctx context.Context, conf config, logger log.Logger) *collecto
 	c.cc = newCMCollector(ctx, logger, c.getClient)
 	c.wc = newWiFiCollector(ctx, logger, c.getClient)
 
+	c.up = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: metricsNS,
+		Name:      "up",
+		Help:      "Whether the device is reachable (1), or not (0)",
+	})
+
 	return c
 }
 
@@ -50,17 +58,22 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 	c.rc.Describe(ch)
 	c.cc.Describe(ch)
 	c.wc.Describe(ch)
+
+	c.up.Describe(ch)
 }
 
 // Collect implements Prometheus.Collector.
 func (c *collector) Collect(ch chan<- prometheus.Metric) {
+	// Assume the worst...
+	c.up.Set(0)
+	defer c.up.Collect(ch)
+
 	var err error
 	c.client, err = hitron.New(c.config.Host, c.config.Username, c.config.Password)
 
 	if err != nil {
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -69,7 +82,6 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -79,4 +91,7 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 	c.rc.Collect(ch)
 	c.cc.Collect(ch)
 	c.wc.Collect(ch)
+
+	// collect is deferred
+	c.up.Set(1)
 }
