@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/go-kit/kit v0.10.0
-	github.com/hairyhenderson/hitron_coda v0.0.0-20210118201752-6c311df8edee
+	github.com/hairyhenderson/hitron_coda v0.0.0-20210119220956-b5a22abdb31e
 	github.com/prometheus/client_golang v1.9.0
 	github.com/prometheus/common v0.15.0
 	github.com/stretchr/testify v1.7.0
