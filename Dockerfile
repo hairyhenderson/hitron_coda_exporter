@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.2.1-labs
-FROM --platform=linux/amd64 golang:1.16.0-alpine AS build
+FROM --platform=linux/amd64 golang:1.16.2-alpine AS build
 
 ARG PKG_NAME
 ARG TARGETOS
@@ -40,7 +40,7 @@ COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${
 
 ENTRYPOINT [ "/hitron_coda_exporter" ]
 
-FROM alpine:3.13.2 AS alpine
+FROM alpine:3.13.3 AS alpine
 
 ARG PKG_NAME
 ARG VCS_REF

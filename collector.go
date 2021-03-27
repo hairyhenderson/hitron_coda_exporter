@@ -12,15 +12,15 @@ import (
 
 type collector struct {
 	ctx    context.Context
-	config config
 	logger log.Logger
-
 	client *hitron.CableModem
 	rc     routerCollector
 	cc     cmCollector
 	wc     wifiCollector
 
 	up prometheus.Gauge
+
+	config config
 }
 
 type debugLogAdapter struct {

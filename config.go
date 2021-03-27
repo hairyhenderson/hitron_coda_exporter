@@ -28,8 +28,8 @@ func parse(in io.Reader) (*config, error) {
 }
 
 type safeConfig struct {
-	sync.RWMutex
 	C *config
+	sync.RWMutex
 }
 
 func (sc *safeConfig) ReloadConfig(configFile string) (err error) {
