@@ -47,7 +47,7 @@ jobs:
       with:
         username: hairyhenderson
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.repository == 'hairyhenderson/hitron_coda_exporter'
+      if: github.repository == 'hairyhenderson/hitron_coda_exporter' && (github.ref == 'refs/heads/main' || env.is_tag == 'true')
     - name: Build & Push (non-main branch)
       run: |
         set -ex
