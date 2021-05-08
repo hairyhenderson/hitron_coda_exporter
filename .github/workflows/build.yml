@@ -22,7 +22,7 @@ jobs:
       image: ghcr.io/hairyhenderson/gomplate-ci-build:latest
     steps:
       - uses: actions/checkout@v2.3.4
-      - run: go install github.com/monitoring-mixins/mixtool/cmd/mixtool
-      - run: go install github.com/google/go-jsonnet/cmd/jsonnetfmt
+      - run: go install github.com/monitoring-mixins/mixtool/cmd/mixtool@latest
+      - run: go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest
       - run: make lint build
         working-directory: hitron-mixin

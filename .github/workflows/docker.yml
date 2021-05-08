@@ -1,5 +1,6 @@
 name: Docker Build
-on: [push]
+on:
+  push:
 
 jobs:
   docker-build:
@@ -31,22 +32,6 @@ jobs:
           network=host
     - name: Available platforms
       run: echo ${{ steps.buildx.outputs.platforms }}
-    # - name: Install BuildX
-    #   run: |
-    #     mkdir -p ~/.docker/cli-plugins
-    #     curl -SL -o ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
-    #     chmod 755 ~/.docker/cli-plugins/docker-buildx
-    # - name: Create BuildX Builder
-    #   run: |
-    #     docker buildx create \
-    #       --name builder \
-    #       --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x,linux/386 \
-    #       --use \
-    #       --driver docker-container --driver-opt image=moby/buildkit:buildx-stable-1,network=host
-    #     docker buildx ls
-    #     docker ps
-    #     docker images
-    # - run: docker info && docker version
     - name: determine if this is a tag
       run: |
         if (git describe --abbrev=0 --exact-match &>/dev/null); then
@@ -62,6 +47,7 @@ jobs:
       with:
         username: hairyhenderson
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.repository == 'hairyhenderson/hitron_coda_exporter'
     - name: Build & Push (non-main branch)
       run: |
         set -ex
