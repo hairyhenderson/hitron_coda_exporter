@@ -28,13 +28,21 @@ var (
 		},
 		func() float64 { return 1 },
 	)
-	exporterDuration = prometheus.NewSummary(
+	exporterDurationSummary = prometheus.NewSummary(
 		prometheus.SummaryOpts{
+			Namespace: metricsNS,
+			Name:      "collection_duration_quantiles_seconds",
+			Help:      "Summary duration of collections by the Hitron CODA exporter",
+			//nolint:gomnd
+			Objectives: map[float64]float64{0.1: 0.05, 0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		},
+	)
+	exporterDuration = prometheus.NewHistogram(
+		prometheus.HistogramOpts{
 			Namespace: metricsNS,
 			Name:      "collection_duration_seconds",
 			Help:      "Duration of collections by the Hitron CODA exporter",
-			//nolint:gomnd
-			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+			Buckets:   []float64{1, 2.5, 5, 8, 10, 15},
 		},
 	)
 	exporterRequestErrors = prometheus.NewCounter(
@@ -55,5 +63,5 @@ var (
 
 func initExporterMetrics() {
 	prometheus.MustRegister(buildInfo)
-	prometheus.MustRegister(exporterDuration, exporterRequestErrors, exporterClientErrors)
+	prometheus.MustRegister(exporterDuration, exporterDurationSummary, exporterRequestErrors, exporterClientErrors)
 }
