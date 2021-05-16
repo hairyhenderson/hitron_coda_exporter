@@ -49,7 +49,9 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	h.ServeHTTP(w, r)
 
 	duration := time.Since(start).Seconds()
+	exporterDurationSummary.Observe(duration)
 	exporterDuration.Observe(duration)
+
 	level.Debug(logger).Log("msg", "Finished scrape", "duration_seconds", duration)
 }
 
