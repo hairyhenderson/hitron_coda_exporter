@@ -40,7 +40,7 @@ COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${
 
 ENTRYPOINT [ "/hitron_coda_exporter" ]
 
-FROM alpine:3.14.1 AS alpine
+FROM alpine:3.14.2 AS alpine
 
 ARG PKG_NAME
 ARG VCS_REF
