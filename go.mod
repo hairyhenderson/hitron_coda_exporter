@@ -6,7 +6,7 @@ require (
 	github.com/go-kit/log v0.2.0
 	github.com/hairyhenderson/hitron_coda v0.0.0-20210902004058-b03d234d3b2c
 	github.com/prometheus/client_golang v1.11.0
-	github.com/prometheus/common v0.30.0
+	github.com/prometheus/common v0.31.0
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
