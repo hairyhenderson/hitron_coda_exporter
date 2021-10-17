@@ -65,16 +65,14 @@ func (c wifiCollector) Collect(ch chan<- prometheus.Metric) {
 		err := fmt.Errorf("client not initialized: %v", client)
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_wifi_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
 
 	wc, err := client.WiFiClient(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping WiFiClient", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_wifi_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
