@@ -222,7 +222,6 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 		err := fmt.Errorf("client not initialized: %v", client)
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -237,9 +236,8 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 func (c cmCollector) collectVersionInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	vi, err := client.CMVersion(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMVersion", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -260,9 +258,8 @@ func (c cmCollector) collectVersionInfo(ch chan<- prometheus.Metric, client *hit
 func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	si, err := client.CMSysInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMSysInfo", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -286,9 +283,8 @@ func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.
 func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	dsinfo, err := client.CMDsInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMDsInfo", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -319,9 +315,8 @@ func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usinfo, err := client.CMUsInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMUsInfo", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
@@ -348,52 +343,46 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usofdm, err := client.CMUsOfdm(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMUsOfdm", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
+	} else {
+		for _, channel := range usofdm.Channels {
+			l := prometheus.Labels{
+				"channel":  strconv.Itoa(channel.ID),
+				"enabled":  strconv.FormatBool(channel.Enable),
+				"fft_size": channel.FFTSize,
+			}
 
-		return
-	}
-
-	for _, channel := range usofdm.Channels {
-		l := prometheus.Labels{
-			"channel":  strconv.Itoa(channel.ID),
-			"enabled":  strconv.FormatBool(channel.Enable),
-			"fft_size": channel.FFTSize,
+			c.usOfdm.channelBw.With(l).Set(channel.ChannelBw)
+			c.usOfdm.digAtten.With(l).Set(channel.DigAtten)
+			c.usOfdm.digAttenBo.With(l).Set(channel.DigAttenBo)
+			c.usOfdm.repPower.With(l).Set(channel.RepPower)
+			c.usOfdm.targetPower.With(l).Set(channel.RepPower1_6)
 		}
 
-		c.usOfdm.channelBw.With(l).Set(channel.ChannelBw)
-		c.usOfdm.digAtten.With(l).Set(channel.DigAtten)
-		c.usOfdm.digAttenBo.With(l).Set(channel.DigAttenBo)
-		c.usOfdm.repPower.With(l).Set(channel.RepPower)
-		c.usOfdm.targetPower.With(l).Set(channel.RepPower1_6)
+		c.usOfdm.channelBw.Collect(ch)
+		c.usOfdm.digAtten.Collect(ch)
+		c.usOfdm.digAttenBo.Collect(ch)
+		c.usOfdm.repPower.Collect(ch)
+		c.usOfdm.targetPower.Collect(ch)
 	}
-
-	c.usOfdm.channelBw.Collect(ch)
-	c.usOfdm.digAtten.Collect(ch)
-	c.usOfdm.digAttenBo.Collect(ch)
-	c.usOfdm.repPower.Collect(ch)
-	c.usOfdm.targetPower.Collect(ch)
 
 	dsofdm, err := client.CMDsOfdm(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping CMDsOfdm", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_cm_error", "Error scraping target", nil, nil), err)
+	} else {
+		for _, receiver := range dsofdm.Receivers {
+			l := prometheus.Labels{
+				"receiver": strconv.Itoa(receiver.ID),
+				"fft_type": receiver.FFTType,
+			}
 
-		return
-	}
-
-	for _, receiver := range dsofdm.Receivers {
-		l := prometheus.Labels{
-			"receiver": strconv.Itoa(receiver.ID),
-			"fft_type": receiver.FFTType,
+			c.dsOfdm.plcPower.With(l).Set(receiver.PLCPower)
+			c.dsOfdm.subcarrierFreq.With(l).Set(float64(receiver.SubcarrierFreq))
 		}
 
-		c.dsOfdm.plcPower.With(l).Set(receiver.PLCPower)
-		c.dsOfdm.subcarrierFreq.With(l).Set(float64(receiver.SubcarrierFreq))
+		c.dsOfdm.plcPower.Collect(ch)
+		c.dsOfdm.subcarrierFreq.Collect(ch)
 	}
-
-	c.dsOfdm.plcPower.Collect(ch)
-	c.dsOfdm.subcarrierFreq.Collect(ch)
 }

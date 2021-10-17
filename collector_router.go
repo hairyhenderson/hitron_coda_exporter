@@ -114,58 +114,51 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 		err := fmt.Errorf("client not initialized: %v", client)
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
 
 		return
 	}
 
 	si, err := client.RouterSysInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping RouterSysInfo", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
+	} else {
+		c.sysInfo.systemTimeSeconds.Set(float64(si.SystemTime.Unix()))
+		c.sysInfo.systemTimeSeconds.Collect(ch)
 
-		return
+		c.sysInfo.lanReceiveBytesTotal.WithLabelValues(si.LANName).Add(float64(si.LanRx))
+		c.sysInfo.lanReceiveBytesTotal.Collect(ch)
+
+		c.sysInfo.lanTransmitBytesTotal.WithLabelValues(si.LANName).Add(float64(si.LanTx))
+		c.sysInfo.lanTransmitBytesTotal.Collect(ch)
+
+		c.sysInfo.systemLanUptimeSeconds.WithLabelValues(si.LANName).Set(si.SystemLanUptime.Seconds())
+		c.sysInfo.systemLanUptimeSeconds.Collect(ch)
+
+		c.sysInfo.wanReceiveBytesTotal.WithLabelValues(si.WanName).Add(float64(si.WanRx))
+		c.sysInfo.wanReceiveBytesTotal.Collect(ch)
+
+		c.sysInfo.wanTransmitBytesTotal.WithLabelValues(si.WanName).Add(float64(si.WanTx))
+		c.sysInfo.wanTransmitBytesTotal.Collect(ch)
+
+		c.sysInfo.wanReceivePacketsTotal.WithLabelValues(si.WanName).Add(float64(si.WanRxPkts))
+		c.sysInfo.wanReceivePacketsTotal.Collect(ch)
+
+		c.sysInfo.wanTransmitPacketsTotal.WithLabelValues(si.WanName).Add(float64(si.WanTxPkts))
+		c.sysInfo.wanTransmitPacketsTotal.Collect(ch)
+
+		c.sysInfo.systemWanUptimeSeconds.WithLabelValues(si.WanName).Set(si.SystemWanUptime.Seconds())
+		c.sysInfo.systemWanUptimeSeconds.Collect(ch)
 	}
-
-	c.sysInfo.systemTimeSeconds.Set(float64(si.SystemTime.Unix()))
-	c.sysInfo.systemTimeSeconds.Collect(ch)
-
-	c.sysInfo.lanReceiveBytesTotal.WithLabelValues(si.LANName).Add(float64(si.LanRx))
-	c.sysInfo.lanReceiveBytesTotal.Collect(ch)
-
-	c.sysInfo.lanTransmitBytesTotal.WithLabelValues(si.LANName).Add(float64(si.LanTx))
-	c.sysInfo.lanTransmitBytesTotal.Collect(ch)
-
-	c.sysInfo.systemLanUptimeSeconds.WithLabelValues(si.LANName).Set(si.SystemLanUptime.Seconds())
-	c.sysInfo.systemLanUptimeSeconds.Collect(ch)
-
-	c.sysInfo.wanReceiveBytesTotal.WithLabelValues(si.WanName).Add(float64(si.WanRx))
-	c.sysInfo.wanReceiveBytesTotal.Collect(ch)
-
-	c.sysInfo.wanTransmitBytesTotal.WithLabelValues(si.WanName).Add(float64(si.WanTx))
-	c.sysInfo.wanTransmitBytesTotal.Collect(ch)
-
-	c.sysInfo.wanReceivePacketsTotal.WithLabelValues(si.WanName).Add(float64(si.WanRxPkts))
-	c.sysInfo.wanReceivePacketsTotal.Collect(ch)
-
-	c.sysInfo.wanTransmitPacketsTotal.WithLabelValues(si.WanName).Add(float64(si.WanTxPkts))
-	c.sysInfo.wanTransmitPacketsTotal.Collect(ch)
-
-	c.sysInfo.systemWanUptimeSeconds.WithLabelValues(si.WanName).Set(si.SystemWanUptime.Seconds())
-	c.sysInfo.systemWanUptimeSeconds.Collect(ch)
 
 	loc, err := client.RouterLocation(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error scraping RouterLocation", "err", err)
 		exporterRequestErrors.Inc()
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(metricsNS+"_router_error", "Error scraping target", nil, nil), err)
-
-		return
+	} else {
+		c.sysInfo.info.With(routerSysInfoLabels(si, loc)).Set(1)
+		c.sysInfo.info.Collect(ch)
 	}
-
-	c.sysInfo.info.With(routerSysInfoLabels(si, loc)).Set(1)
-	c.sysInfo.info.Collect(ch)
 }
 
 func routerSysInfoLabels(sysInfo hitron.RouterSysInfo, loc hitron.RouterLocation) prometheus.Labels {

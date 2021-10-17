@@ -80,7 +80,7 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 
 	err = c.client.Login(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		level.Error(c.logger).Log("msg", "Error logging in", "err", err)
 		exporterClientErrors.Inc()
 
 		return
