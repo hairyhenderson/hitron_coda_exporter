@@ -7,21 +7,21 @@ jobs:
     container:
       image: ghcr.io/hairyhenderson/gomplate-ci-build:latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - run: make test
   lint:
     runs-on: ubuntu-20.04
     container:
       image: ghcr.io/hairyhenderson/gomplate-ci-build:latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - run: make ci-lint
   test-mixin:
     runs-on: ubuntu-20.04
     container:
       image: ghcr.io/hairyhenderson/gomplate-ci-build:latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - run: go install github.com/monitoring-mixins/mixtool/cmd/mixtool@latest
       - run: go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest
       - run: make lint build
