@@ -175,7 +175,14 @@ func main() {
 
 	level.Info(logger).Log("msg", "Listening on", "address", *listenAddress)
 
-	if err := http.ListenAndServe(*listenAddress, mux); err != nil {
+	srv := &http.Server{
+		Addr:    *listenAddress,
+		Handler: mux,
+		//nolint:gomnd
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
 		level.Error(logger).Log("msg", "Error starting HTTP server", "err", err)
 
 		exitCode = 1
