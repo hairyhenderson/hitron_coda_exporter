@@ -10,6 +10,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/hairyhenderson/hitron_coda_exporter/internal/version"
@@ -17,13 +18,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/promlog/flag"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
 	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("hitron_coda.yml").String()
 	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9780").String()
-	// dryRun        = kingpin.Flag("dry-run", "Only verify configuration is valid and exit.").Default("false").Bool()
 
 	sc = &safeConfig{
 		C: &config{},
