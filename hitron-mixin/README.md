@@ -9,8 +9,8 @@ To use them, you need to have `mixtool` and `jsonnetfmt` installed. If you
 have a working Go development environment, it's easiest to run the following:
 
 ```console
-$ go get github.com/monitoring-mixins/mixtool/cmd/mixtool
-$ go get github.com/google/go-jsonnet/cmd/jsonnetfmt
+$ go install github.com/monitoring-mixins/mixtool/cmd/mixtool@latest
+$ go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest
 ```
 
 You can then build the Prometheus rules files `alerts.yaml` and
