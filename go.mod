@@ -3,7 +3,7 @@ module github.com/hairyhenderson/hitron_coda_exporter
 go 1.19
 
 require (
-	github.com/alecthomas/kingpin/v2 v2.3.2
+	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/go-kit/log v0.2.1
 	github.com/hairyhenderson/hitron_coda v0.0.0-20230225142238-f4b412fad70a
 	github.com/prometheus/client_golang v1.19.0
