@@ -8,7 +8,7 @@ require (
 	github.com/hairyhenderson/hitron_coda v0.0.0-20230225142238-f4b412fad70a
 	github.com/prometheus/client_golang v1.19.0
 	github.com/prometheus/common v0.48.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
