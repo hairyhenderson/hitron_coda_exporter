@@ -69,8 +69,8 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 	defer c.up.Collect(ch)
 
 	var err error
-	c.client, err = hitron.New(c.config.Host, c.config.Username, c.config.Password)
 
+	c.client, err = hitron.New(c.config.Host, c.config.Username, c.config.Password)
 	if err != nil {
 		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
 		exporterClientErrors.Inc()

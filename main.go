@@ -105,7 +105,7 @@ func initRoutes(logger log.Logger) http.Handler {
 		}
 	})
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(`<html>
 <head>
 	<title>Hitron CODA Cable Modem Exporter</title>
