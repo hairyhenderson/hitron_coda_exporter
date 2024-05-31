@@ -3,10 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	hitron "github.com/hairyhenderson/hitron_coda"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -15,7 +14,6 @@ import (
 type cmCollector struct {
 	ctx     context.Context
 	client  func() *hitron.CableModem
-	logger  log.Logger
 	sysInfo struct {
 		usDataRate       prometheus.Gauge
 		dsDataRate       prometheus.Gauge
@@ -49,8 +47,8 @@ type cmCollector struct {
 }
 
 //nolint:funlen
-func newCMCollector(ctx context.Context, logger log.Logger, clientProvider func() *hitron.CableModem) cmCollector {
-	c := cmCollector{ctx: ctx, logger: logger, client: clientProvider}
+func newCMCollector(ctx context.Context, clientProvider func() *hitron.CableModem) cmCollector {
+	c := cmCollector{ctx: ctx, client: clientProvider}
 
 	sub := "cm"
 
@@ -220,7 +218,7 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 	client := c.client()
 	if client == nil {
 		err := fmt.Errorf("client not initialized: %v", client)
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping target", slog.Any("err", err))
 		exporterClientErrors.Inc()
 
 		return
@@ -236,7 +234,7 @@ func (c cmCollector) Collect(ch chan<- prometheus.Metric) {
 func (c cmCollector) collectVersionInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	vi, err := client.CMVersion(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMVersion", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMVersion", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 
 		return
@@ -258,7 +256,7 @@ func (c cmCollector) collectVersionInfo(ch chan<- prometheus.Metric, client *hit
 func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	si, err := client.CMSysInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMSysInfo", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMSysInfo", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 
 		return
@@ -283,7 +281,7 @@ func (c cmCollector) collectSysInfo(ch chan<- prometheus.Metric, client *hitron.
 func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	dsinfo, err := client.CMDsInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMDsInfo", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMDsInfo", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 
 		return
@@ -315,7 +313,7 @@ func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usinfo, err := client.CMUsInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMUsInfo", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMUsInfo", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 
 		return
@@ -343,7 +341,7 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.CableModem) {
 	usofdm, err := client.CMUsOfdm(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMUsOfdm", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMUsOfdm", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 	} else {
 		for _, channel := range usofdm.Channels {
@@ -369,7 +367,7 @@ func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.Cab
 
 	dsofdm, err := client.CMDsOfdm(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping CMDsOfdm", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping CMDsOfdm", slog.Any("err", err))
 		exporterRequestErrors.Inc()
 	} else {
 		for _, receiver := range dsofdm.Receivers {

@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	hitron "github.com/hairyhenderson/hitron_coda"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -14,7 +13,6 @@ import (
 type routerCollector struct {
 	ctx     context.Context
 	client  func() *hitron.CableModem
-	logger  log.Logger
 	sysInfo struct {
 		systemTimeSeconds       prometheus.Gauge
 		lanReceiveBytesTotal    *prometheus.CounterVec
@@ -30,8 +28,8 @@ type routerCollector struct {
 }
 
 //nolint:funlen
-func newRouterCollector(ctx context.Context, logger log.Logger, clientProvider func() *hitron.CableModem) routerCollector {
-	c := routerCollector{ctx: ctx, logger: logger, client: clientProvider}
+func newRouterCollector(ctx context.Context, clientProvider func() *hitron.CableModem) routerCollector {
+	c := routerCollector{ctx: ctx, client: clientProvider}
 
 	sub := "router"
 
@@ -112,7 +110,7 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 	client := c.client()
 	if client == nil {
 		err := fmt.Errorf("client not initialized: %v", client)
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
 
 		return
@@ -120,7 +118,7 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 
 	si, err := client.RouterSysInfo(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping RouterSysInfo", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping RouterSysInfo", "err", err)
 		exporterRequestErrors.Inc()
 	} else {
 		c.sysInfo.systemTimeSeconds.Set(float64(si.SystemTime.Unix()))
@@ -153,7 +151,7 @@ func (c routerCollector) Collect(ch chan<- prometheus.Metric) {
 
 	loc, err := client.RouterLocation(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping RouterLocation", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping RouterLocation", "err", err)
 		exporterRequestErrors.Inc()
 	} else {
 		c.sysInfo.info.With(routerSysInfoLabels(si, loc)).Set(1)

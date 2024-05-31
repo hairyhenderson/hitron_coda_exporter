@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	hitron "github.com/hairyhenderson/hitron_coda"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -14,7 +13,6 @@ import (
 type wifiCollector struct {
 	ctx    context.Context
 	client func() *hitron.CableModem
-	logger log.Logger
 
 	clientStats struct {
 		rssi      *prometheus.GaugeVec
@@ -23,8 +21,8 @@ type wifiCollector struct {
 	}
 }
 
-func newWiFiCollector(ctx context.Context, logger log.Logger, clientProvider func() *hitron.CableModem) wifiCollector {
-	c := wifiCollector{ctx: ctx, logger: logger, client: clientProvider}
+func newWiFiCollector(ctx context.Context, clientProvider func() *hitron.CableModem) wifiCollector {
+	c := wifiCollector{ctx: ctx, client: clientProvider}
 
 	sub := "wifi"
 
@@ -63,7 +61,7 @@ func (c wifiCollector) Collect(ch chan<- prometheus.Metric) {
 	client := c.client()
 	if client == nil {
 		err := fmt.Errorf("client not initialized: %v", client)
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping target", "err", err)
 		exporterClientErrors.Inc()
 
 		return
@@ -71,7 +69,7 @@ func (c wifiCollector) Collect(ch chan<- prometheus.Metric) {
 
 	wc, err := client.WiFiClient(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping WiFiClient", "err", err)
+		slog.ErrorContext(c.ctx, "Error scraping WiFiClient", "err", err)
 		exporterRequestErrors.Inc()
 
 		return
