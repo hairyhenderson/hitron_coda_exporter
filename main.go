@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -11,27 +12,20 @@ import (
 	_ "time/tzdata"
 
 	"github.com/alecthomas/kingpin/v2"
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/hairyhenderson/hitron_coda_exporter/internal/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/promlog"
-	"github.com/prometheus/common/promlog/flag"
 )
 
 var (
-	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("hitron_coda.yml").String()
-	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9780").String()
-
 	sc = &safeConfig{
 		C: &config{},
 	}
 	reloadCh chan chan error
 )
 
-func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
-	level.Debug(logger).Log("msg", "Starting scrape")
+func handler(w http.ResponseWriter, r *http.Request) {
+	slog.DebugContext(r.Context(), "Starting scrape")
 
 	start := time.Now()
 
@@ -40,7 +34,7 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	sc.RUnlock()
 
 	registry := prometheus.NewRegistry()
-	collector := newCollector(r.Context(), conf, logger)
+	collector := newCollector(r.Context(), conf)
 	registry.MustRegister(collector)
 
 	// Delegate http serving to Prometheus client library, which will call collector.Collect.
@@ -51,10 +45,10 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	exporterDurationSummary.Observe(duration)
 	exporterDuration.Observe(duration)
 
-	level.Debug(logger).Log("msg", "Finished scrape", "duration_seconds", duration)
+	slog.DebugContext(r.Context(), "Finished scrape", slog.Float64("duration_seconds", duration))
 }
 
-func handleHUP(logger log.Logger) {
+func handleHUP(configFile string) {
 	hup := make(chan os.Signal, 1)
 	signal.Notify(hup, syscall.SIGHUP)
 
@@ -64,17 +58,17 @@ func handleHUP(logger log.Logger) {
 		for {
 			select {
 			case <-hup:
-				if err := sc.ReloadConfig(*configFile); err != nil {
-					level.Error(logger).Log("msg", "Error reloading config", "err", err)
+				if err := sc.ReloadConfig(configFile); err != nil {
+					slog.Error("Error reloading config", "err", err)
 				} else {
-					level.Info(logger).Log("msg", "Loaded config file")
+					slog.Info("Loaded config file")
 				}
 			case rc := <-reloadCh:
-				if err := sc.ReloadConfig(*configFile); err != nil {
-					level.Error(logger).Log("msg", "Error reloading config", "err", err)
+				if err := sc.ReloadConfig(configFile); err != nil {
+					slog.Error("Error reloading config", "err", err)
 					rc <- err
 				} else {
-					level.Info(logger).Log("msg", "Loaded config file")
+					slog.Info("Loaded config file")
 					rc <- nil
 				}
 			}
@@ -82,17 +76,17 @@ func handleHUP(logger log.Logger) {
 	}()
 }
 
-func initRoutes(logger log.Logger) http.Handler {
+func initRoutes() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
 	// Endpoint to do scrapes.
 	mux.HandleFunc("/scrape", func(w http.ResponseWriter, r *http.Request) {
-		handler(w, r, logger)
+		handler(w, r)
 	})
 	mux.HandleFunc("/-/reload", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "POST":
-			level.Debug(logger).Log("msg", "Reloading config from HTTP endpoint")
+			slog.DebugContext(r.Context(), "Reloading config from HTTP endpoint")
 
 			rc := make(chan error)
 			reloadCh <- rc
@@ -145,45 +139,81 @@ func main() {
 
 	defer func() { os.Exit(exitCode) }()
 
-	promlogConfig := &promlog.Config{}
-	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+	level := "info"
+	format := "logfmt"
+	configFile := "hitron_coda.yml"
+	listenAddress := ":9780"
+
 	kingpin.HelpFlag.Short('h')
 	kingpin.Version(version.Version)
 	kingpin.CommandLine.VersionFlag.Short('v')
-	kingpin.Parse()
+	kingpin.Flag("log.level", "log level (debug, info, warn, error)").Default("info").StringVar(&level)
+	kingpin.Flag("log.format", "log format (logfmt, json)").Default("logfmt").StringVar(&format)
+	kingpin.Flag("config.file", "Path to configuration file.").Default("hitron_coda.yml").StringVar(&configFile)
+	kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9780").StringVar(&listenAddress)
 
-	logger := promlog.New(promlogConfig)
+	kingpin.Parse()
 
 	initExporterMetrics()
 
-	level.Info(logger).Log("msg", "Starting hitron_coda_exporter", "version", version.Version, "commit", version.GitCommit)
+	initLogger(level, format)
+
+	slog.Info("Starting hitron_coda_exporter", "version", version.Version, "commit", version.GitCommit)
 
 	// Bail early if the config is bad.
-	err := sc.ReloadConfig(*configFile)
+	err := sc.ReloadConfig(configFile)
 	if err != nil {
-		level.Error(logger).Log("msg", "Error parsing config file", "err", err)
+		slog.Error("Error parsing config file", "err", err)
 
 		exitCode = 1
 
 		return
 	}
 
-	handleHUP(logger)
+	handleHUP(configFile)
 
-	mux := initRoutes(logger)
+	mux := initRoutes()
 
-	level.Info(logger).Log("msg", "Listening on", "address", *listenAddress)
+	slog.Info("Listening on", "address", listenAddress)
 
 	srv := &http.Server{
-		Addr:    *listenAddress,
+		Addr:    listenAddress,
 		Handler: mux,
 		//nolint:gomnd
 		ReadHeaderTimeout: 2 * time.Second,
 	}
 
 	if err := srv.ListenAndServe(); err != nil {
-		level.Error(logger).Log("msg", "Error starting HTTP server", "err", err)
+		slog.Error("Error starting HTTP server", "err", err)
 
 		exitCode = 1
 	}
+}
+
+func initLogger(level, format string) {
+	lvl := slog.LevelInfo
+
+	switch level {
+	case "debug":
+		lvl = slog.LevelDebug
+	case "info":
+		lvl = slog.LevelInfo
+	case "warn":
+		lvl = slog.LevelWarn
+	case "error":
+		lvl = slog.LevelError
+	}
+
+	opts := &slog.HandlerOptions{Level: lvl}
+
+	var handler slog.Handler
+
+	switch format {
+	case "json":
+		handler = slog.NewJSONHandler(os.Stderr, opts)
+	default:
+		handler = slog.NewTextHandler(os.Stderr, opts)
+	}
+
+	slog.SetDefault(slog.New(handler))
 }

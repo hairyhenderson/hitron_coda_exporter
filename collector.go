@@ -2,17 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	hitron "github.com/hairyhenderson/hitron_coda"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type collector struct {
 	ctx    context.Context
-	logger log.Logger
 	client *hitron.CableModem
 	rc     routerCollector
 	cc     cmCollector
@@ -23,22 +20,11 @@ type collector struct {
 	config config
 }
 
-type debugLogAdapter struct {
-	log.Logger
-}
-
-func (l debugLogAdapter) Logf(format string, args ...interface{}) {
-	l.Log("msg", fmt.Sprintf(format, args...))
-}
-
-func newCollector(ctx context.Context, conf config, logger log.Logger) *collector {
-	debugLogger := debugLogAdapter{level.Debug(logger)}
-	ctx = hitron.ContextWithDebugLogger(ctx, debugLogger)
-
-	c := &collector{ctx: ctx, config: conf, logger: logger}
-	c.rc = newRouterCollector(ctx, logger, c.getClient)
-	c.cc = newCMCollector(ctx, logger, c.getClient)
-	c.wc = newWiFiCollector(ctx, logger, c.getClient)
+func newCollector(ctx context.Context, conf config) *collector {
+	c := &collector{ctx: ctx, config: conf}
+	c.rc = newRouterCollector(ctx, c.getClient)
+	c.cc = newCMCollector(ctx, c.getClient)
+	c.wc = newWiFiCollector(ctx, c.getClient)
 
 	c.up = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: metricsNS,
@@ -72,7 +58,7 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 
 	c.client, err = hitron.New(c.config.Host, c.config.Username, c.config.Password)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error scraping target", "err", err)
+		slog.ErrorContext(c.ctx, "Error creating client", "err", err)
 		exporterClientErrors.Inc()
 
 		return
@@ -80,7 +66,7 @@ func (c *collector) Collect(ch chan<- prometheus.Metric) {
 
 	err = c.client.Login(c.ctx)
 	if err != nil {
-		level.Error(c.logger).Log("msg", "Error logging in", "err", err)
+		slog.ErrorContext(c.ctx, "Error logging in", "err", err)
 		exporterClientErrors.Inc()
 
 		return
