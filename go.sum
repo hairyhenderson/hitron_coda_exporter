@@ -18,6 +18,8 @@ github.com/hairyhenderson/hitron_coda v0.2.3 h1:R9YQUsArtf2j5Abvhj7p/G8TDiJTwYcu
 github.com/hairyhenderson/hitron_coda v0.2.3/go.mod h1:zUOg1XtAmlztphnkeAjnoJw8M3BAoGz06X8lkUmSpfY=
 github.com/hairyhenderson/hitron_coda v0.2.4 h1:NmcW66Of7CcSAeJoVm2PDf2H4OR3CGNS8yE+livLoKo=
 github.com/hairyhenderson/hitron_coda v0.2.4/go.mod h1:fNZn3poTDjOgKSlfivMuiBifFz13hhltC//YoILWTaE=
+github.com/hairyhenderson/hitron_coda v0.2.5 h1:mChvcpnbM7k+g1EmpmxxH6Wp4J6lvR+3Z0jUYmTF18M=
+github.com/hairyhenderson/hitron_coda v0.2.5/go.mod h1:4xi6p2jjHlhOXEgYEk0oOYI2oJmVe4RZYtU5phle1Cg=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
