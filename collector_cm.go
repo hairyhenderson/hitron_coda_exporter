@@ -10,6 +10,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// labelChannel is the metric label name for a channel ID
+const labelChannel = "channel"
+
 // cmCollector tracks interesting metrics from the hitron CM* APIs
 type cmCollector struct {
 	ctx     context.Context
@@ -71,7 +74,7 @@ func newCMCollector(ctx context.Context, clientProvider func() *hitron.CableMode
 		Help:      "Lease duration for DHCP on WAN interface",
 	}, []string{"ip", "mac_addr"})
 
-	portInfoLabels := []string{"port", "channel", "modulation"}
+	portInfoLabels := []string{"port", labelChannel, "modulation"}
 	c.dsInfo.frequency = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
@@ -142,7 +145,7 @@ func newCMCollector(ctx context.Context, clientProvider func() *hitron.CableMode
 		Help:      "Power level device was instructed to use on this OFDM connection by the Physical Link Channel, in dB above/below 1mV",
 	}, dsOfdmLabels)
 
-	usOfdmLabels := []string{"channel", "enabled", "fft_size"}
+	usOfdmLabels := []string{labelChannel, "enabled", "fft_size"}
 	c.usOfdm.digAtten = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
@@ -290,7 +293,7 @@ func (c cmCollector) collectDsInfo(ch chan<- prometheus.Metric, client *hitron.C
 	for _, port := range dsinfo.Ports {
 		l := prometheus.Labels{
 			"port":       port.PortID,
-			"channel":    port.ChannelID,
+			labelChannel: port.ChannelID,
 			"modulation": port.Modulation,
 		}
 
@@ -322,7 +325,7 @@ func (c cmCollector) collectUsInfo(ch chan<- prometheus.Metric, client *hitron.C
 	for _, port := range usinfo.Ports {
 		l := prometheus.Labels{
 			"port":       port.PortID,
-			"channel":    port.ChannelID,
+			labelChannel: port.ChannelID,
 			"modulation": port.Modulation,
 		}
 
@@ -346,9 +349,9 @@ func (c cmCollector) collectOfdm(ch chan<- prometheus.Metric, client *hitron.Cab
 	} else {
 		for _, channel := range usofdm.Channels {
 			l := prometheus.Labels{
-				"channel":  strconv.Itoa(channel.ID),
-				"enabled":  strconv.FormatBool(channel.Enable),
-				"fft_size": channel.FFTSize,
+				labelChannel: strconv.Itoa(channel.ID),
+				"enabled":    strconv.FormatBool(channel.Enable),
+				"fft_size":   channel.FFTSize,
 			}
 
 			c.usOfdm.channelBw.With(l).Set(channel.ChannelBw)
