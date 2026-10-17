@@ -21,6 +21,11 @@
     {
       "matchUpdateTypes": ["major"],
       "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Own modules: no release-age wait, we publish these ourselves",
+      "matchPackageNames": ["github.com/hairyhenderson/**"],
+      "minimumReleaseAge": null
     }
   ]
 }
