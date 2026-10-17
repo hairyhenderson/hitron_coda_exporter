@@ -1,6 +1,6 @@
 module github.com/hairyhenderson/hitron_coda_exporter
 
-go 1.23.0
+go 1.27.2
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.2.1-labs@sha256:600e5c62eedff338b3f7a0850beb7c05866e0ef27b2d2e8c02aa468e78496ff5
-FROM --platform=linux/amd64 golang:1.24-alpine@sha256:8bee1901f1e530bfb4a7850aa7a479d17ae3a18beb6e09064ed54cfd245b7191 AS build
+FROM --platform=linux/amd64 golang:1.27-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS build
 
 ARG PKG_NAME
 ARG TARGETOS
