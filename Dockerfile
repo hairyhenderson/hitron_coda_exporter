@@ -1,5 +1,5 @@
-# syntax=docker/dockerfile:1.2.1-labs
-FROM --platform=linux/amd64 golang:1.24-alpine AS build
+# syntax=docker/dockerfile:1.2.1-labs@sha256:600e5c62eedff338b3f7a0850beb7c05866e0ef27b2d2e8c02aa468e78496ff5
+FROM --platform=linux/amd64 golang:1.24-alpine@sha256:8bee1901f1e530bfb4a7850aa7a479d17ae3a18beb6e09064ed54cfd245b7191 AS build
 
 ARG PKG_NAME
 ARG TARGETOS
@@ -40,7 +40,7 @@ COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${
 
 ENTRYPOINT [ "/hitron_coda_exporter" ]
 
-FROM alpine:3.22 AS alpine
+FROM alpine:3.22@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 AS alpine
 
 ARG PKG_NAME
 ARG VCS_REF
@@ -56,7 +56,7 @@ COPY --from=build /bin/${PKG_NAME}_${TARGETOS}-${TARGETARCH}${TARGETVARIANT} /${
 
 ENTRYPOINT [ "/hitron_coda_exporter" ]
 
-FROM --platform=windows/amd64 mcr.microsoft.com/windows/nanoserver:2009-KB4579311 AS release-windows
+FROM --platform=windows/amd64 mcr.microsoft.com/windows/nanoserver:2009-KB4579311@sha256:b9d2bb3399baac0ce0881ac82f03e759dadcf4edf751ebd9682b1435f6b9b71d AS release-windows
 
 ARG PKG_NAME
 ARG TARGETOS
