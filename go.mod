@@ -4,7 +4,7 @@ go 1.27.2
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/hairyhenderson/hitron_coda v0.2.4
+	github.com/hairyhenderson/hitron_coda v0.2.5
 	github.com/prometheus/client_golang v1.25.0
 	github.com/stretchr/testify v1.12.1
 	gopkg.in/yaml.v3 v3.0.1
