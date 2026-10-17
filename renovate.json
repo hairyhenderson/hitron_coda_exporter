@@ -26,6 +26,13 @@
       "description": "Own modules: no release-age wait, we publish these ourselves",
       "matchPackageNames": ["github.com/hairyhenderson/**"],
       "minimumReleaseAge": null
+    },
+    {
+      "description": "This is a binary, not a library: keep the go directive current (Renovate doesn't bump it by default)",
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "rangeStrategy": "bump"
     }
   ]
 }
