@@ -9,6 +9,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// labelWANName is the metric label name for a WAN interface
+const labelWANName = "wan_name"
+
 // routerCollector tracks interesting metrics from the hitron Router* APIs
 type routerCollector struct {
 	ctx     context.Context
@@ -64,31 +67,31 @@ func newRouterCollector(ctx context.Context, clientProvider func() *hitron.Cable
 		Subsystem: sub,
 		Name:      "wan_receive_bytes_total",
 		Help:      "Number of bytes received on the WAN interface",
-	}, []string{"wan_name"})
+	}, []string{labelWANName})
 	c.sysInfo.wanTransmitBytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
 		Name:      "wan_transmit_bytes_total",
 		Help:      "Number of bytes transmitted on the WAN interface",
-	}, []string{"wan_name"})
+	}, []string{labelWANName})
 	c.sysInfo.wanReceivePacketsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
 		Name:      "wan_receive_packets_total",
 		Help:      "Number of packets received on the WAN interface",
-	}, []string{"wan_name"})
+	}, []string{labelWANName})
 	c.sysInfo.wanTransmitPacketsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
 		Name:      "wan_transmit_packets_total",
 		Help:      "Number of packets transmitted on the WAN interface",
-	}, []string{"wan_name"})
+	}, []string{labelWANName})
 	c.sysInfo.systemWanUptimeSeconds = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: metricsNS,
 		Subsystem: sub,
 		Name:      "wan_uptime_seconds",
 		Help:      "The WAN interface's uptime in seconds",
-	}, []string{"wan_name"})
+	}, []string{labelWANName})
 
 	c.sysInfo.info = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: metricsNS,
