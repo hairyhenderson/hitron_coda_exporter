@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.3](https://github.com/hairyhenderson/hitron_coda_exporter/compare/v0.1.2...v0.1.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* **gomod:** update module github.com/hairyhenderson/hitron_coda to v0.2.5 ([#267](https://github.com/hairyhenderson/hitron_coda_exporter/issues/267)) ([be59035](https://github.com/hairyhenderson/hitron_coda_exporter/commit/be59035d9b0e7cd30b977714b0b18002d9b66588))
+
+
+### Dependencies
+
+* update Go to 1.27.3 ([#270](https://github.com/hairyhenderson/hitron_coda_exporter/issues/270)) ([3ad7b36](https://github.com/hairyhenderson/hitron_coda_exporter/commit/3ad7b366f83b463210cb2bd9cccc17fff8bb166a))
+
 ## [0.1.2](https://github.com/hairyhenderson/hitron_coda_exporter/compare/v0.1.1...v0.1.2) (2026-10-17)
 
 
