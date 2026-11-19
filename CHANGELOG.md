@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/hairyhenderson/hitron_coda_exporter/compare/v0.1.3...v0.1.4) (2026-11-19)
+
+
+### Dependencies
+
+* build with Go 1.27.4 via a toolchain directive ([#291](https://github.com/hairyhenderson/hitron_coda_exporter/issues/291)) ([b6cfd85](https://github.com/hairyhenderson/hitron_coda_exporter/commit/b6cfd85e2a7b35cbfdc9c06252c4d5497fe6f989))
+
 ## [0.1.3](https://github.com/hairyhenderson/hitron_coda_exporter/compare/v0.1.2...v0.1.3) (2026-10-21)
 
 
