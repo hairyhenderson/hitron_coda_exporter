@@ -20,6 +20,8 @@ github.com/hairyhenderson/hitron_coda v0.2.4 h1:NmcW66Of7CcSAeJoVm2PDf2H4OR3CGNS
 github.com/hairyhenderson/hitron_coda v0.2.4/go.mod h1:fNZn3poTDjOgKSlfivMuiBifFz13hhltC//YoILWTaE=
 github.com/hairyhenderson/hitron_coda v0.2.5 h1:mChvcpnbM7k+g1EmpmxxH6Wp4J6lvR+3Z0jUYmTF18M=
 github.com/hairyhenderson/hitron_coda v0.2.5/go.mod h1:4xi6p2jjHlhOXEgYEk0oOYI2oJmVe4RZYtU5phle1Cg=
+github.com/hairyhenderson/hitron_coda v0.2.6 h1:l/9TA4KQS4rkdn9nRt7jRN4Nj98zIh9HaJZE4Jkg6fY=
+github.com/hairyhenderson/hitron_coda v0.2.6/go.mod h1:tUx9YTRZBUgvHTJKSOSAc+YBoZmBL2/iKxVXI9M1RCk=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
@@ -79,6 +81,8 @@ golang.org/x/text v0.41.0 h1:vz/seA0lnX87Othu2f/0L24RcgrXD9/YFTSuGjj3rH8=
 golang.org/x/text v0.41.0/go.mod h1:jvf1O8ajNzZqhSrQBPbutR/EB83Cc0CFrezNQIwbb5M=
 golang.org/x/text v0.43.0 h1:1QivrlhwAsnMOcqgOdl9my7s9OyZl8O5/UGUTJVXoWc=
 golang.org/x/text v0.43.0/go.mod h1:hbSIYA/amXcRXTFSZqh8tWHEoqRvvbKPJ2uz/KU+a+s=
+golang.org/x/text v0.44.0 h1:YItdp/mQNGnsmrgpcdA5yQ3bnRxCfo/Tj/iByGW9GGo=
+golang.org/x/text v0.44.0/go.mod h1:S4FR1waQ9LbjQTls97SyRjDaUUVkaM+cXwwuG/G+MwY=
 google.golang.org/protobuf v1.36.5 h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=
 google.golang.org/protobuf v1.36.5/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 google.golang.org/protobuf v1.36.12 h1:pJOKDDOyeXErUroCihFAd5LQuwXBSpVnKGrj5o/fwxc=

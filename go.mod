@@ -6,7 +6,7 @@ toolchain go1.27.4
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/hairyhenderson/hitron_coda v0.2.5
+	github.com/hairyhenderson/hitron_coda v0.2.6
 	github.com/prometheus/client_golang v1.25.0
 	github.com/stretchr/testify v1.12.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -23,6 +23,6 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sys v0.48.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
